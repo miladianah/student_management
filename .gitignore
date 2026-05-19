@@ -1,0 +1,19 @@
+# System files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# VS Code
+.vscode/
+
+# Environment files
+.env
+
+# Database backups
+database/*.sql
+
+# Temporary files
+temp/
+tmp/
