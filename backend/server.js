@@ -7,8 +7,9 @@ const app = express();
 
 // app.use(cors({ origin: process.env.CLIENT_URL, credentials: true }));
 app.use(cors({
-  origin: 'https://imaginative-naiad-f52119.netlify.app', // Urubuga rwawe rwa Netlify
-  credentials: true
+  origin: '*', 
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
 }));
 
 app.use(express.json());
