@@ -7,7 +7,7 @@ import { LogOut, Menu, X, BookOpen, Sun, Moon } from 'lucide-react';
 
 // const API = 'http://localhost:5000';
 
-const API = 'https://student-management-backend-cmz6.onrender.com';
+const API = 'https://student-management-backend.onrender.com';
 
 function UserAvatar({ user, size = 9 }) {
   const s = `w-${size} h-${size}`;

@@ -4,7 +4,8 @@ import { useAuth } from '../context/AuthContext';
 import toast from 'react-hot-toast';
 import { Camera, User, Lock, Save } from 'lucide-react';
 
-const API = 'http://localhost:5000';
+// const API = 'http://localhost:5000';
+const API = 'https://student-management-backend.onrender.com';
 
 export default function Profile() {
   const { user, updateUser } = useAuth();
