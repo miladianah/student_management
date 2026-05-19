@@ -5,17 +5,23 @@ require('dotenv').config();
 
 const app = express();
 
-// app.use(cors({ origin: process.env.CLIENT_URL, credentials: true }));
+// 1. CONFIGURATION YA CORS (Ize hejuru y'ibindi byose)
 app.use(cors({
-  origin: '*', 
+  origin: 'https://imaginative-naiad-f52119.netlify.app', // Urubuga rwawe rwa Netlify gusa cyangwa ukahagumisha '*'
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization']
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  credentials: true
 }));
+
+// 2. GUFATA PREFLIGHT (OPTIONS) REQUESTS BURUNDU
+// Ibi bihita bisubiza Browser mu masegonda 0 iyo ije kubaza niba amarembo afunguye
+app.options('*', cors());
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
+// Ama-Routes aze munsi ya CORS n'ibindi byose
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/admin', require('./routes/admin'));
 app.use('/api/teacher', require('./routes/teacher'));
