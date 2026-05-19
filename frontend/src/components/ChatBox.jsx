@@ -4,7 +4,7 @@ import { useAuth } from '../context/AuthContext';
 import { Send, MessageSquare, Pencil, Trash2, Check, X } from 'lucide-react';
 
 // const API = 'http://localhost:5000';
-const API = 'https://student-management-backend.onrender.com';
+const API = 'https://student-management-backend-cmz6.onrender.com';
 
 function Avatar({ user, size = 10 }) {
   const s = `w-${size} h-${size}`;
