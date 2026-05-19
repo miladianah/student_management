@@ -1,8 +1,16 @@
 const express = require('express');
 const path = require('path');
 require('dotenv').config();
-
+const fs = require('fs');
 const app = express();
+
+
+// Emeza niba folder ya uploads iriho, niba itariho ihite uyihanza bwikora
+const uploadDir = path.join(__dirname, 'uploads');
+if (!fs.existsSync(uploadDir)) {
+    fs.mkdirSync(uploadDir, { recursive: true });
+    console.log('Uploads folder created successfully for Render!');
+}
 
 // 1. HITAMO KUGIRIRA CORS ITURUTSE KURI EXPRESS DIRECTLY (Siba ya cors package)
 app.use((req, res, next) => {
