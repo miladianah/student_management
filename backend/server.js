@@ -1,27 +1,28 @@
 const express = require('express');
-const cors = require('cors');
 const path = require('path');
 require('dotenv').config();
 
 const app = express();
 
-// 1. CONFIGURATION YA CORS (Ize hejuru y'ibindi byose)
-app.use(cors({
-  origin: 'https://imaginative-naiad-f52119.netlify.app', // Urubuga rwawe rwa Netlify gusa cyangwa ukahagumisha '*'
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
-  credentials: true
-}));
-
-// 2. GUFATA PREFLIGHT (OPTIONS) REQUESTS BURUNDU
-// Ibi bihita bisubiza Browser mu masegonda 0 iyo ije kubaza niba amarembo afunguye
-app.options('*', cors());
+// 1. HITAMO KUGIRIRA CORS ITURUTSE KURI EXPRESS DIRECTLY (Siba ya cors package)
+app.use((req, res, next) => {
+  res.setHeader('Access-Control-Allow-Origin', 'https://imaginative-naiad-f52119.netlify.app');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  res.setHeader('Access-Control-Allow-Credentials', 'true');
+  
+  // Niba ari OPTIONS request (Preflight), hita uyisubiza ako kanya ntirindire kujya mu ma routes
+  if (req.method === 'OPTIONS') {
+    return res.sendStatus(200);
+  }
+  next();
+});
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
-// Ama-Routes aze munsi ya CORS n'ibindi byose
+// Ama-routes yawe...
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/admin', require('./routes/admin'));
 app.use('/api/teacher', require('./routes/teacher'));
