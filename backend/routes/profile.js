@@ -1,13 +1,14 @@
-const express = require('express');
-const router = express.Router();
-const { verifyToken } = require('../middleware/auth');
-const upload = require('../middleware/upload');
-const { getProfile, updateProfile, updateProfilePicture, changePassword } = require('../controllers/profileController');
+const multer = require('multer');
+const path = require('path');
 
-router.use(verifyToken);
-router.get('/', getProfile);
-router.put('/', updateProfile);
-router.post('/picture', upload.single('profile_picture'), updateProfilePicture);
-router.put('/password', changePassword);
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    // Koresha path.join kugira ngo OS ya Linux yo kuri Render itazagira ikibazo
+    cb(null, path.join(__dirname, '../uploads')); 
+  },
+  filename: function (req, file, cb) {
+    cb(null, Date.now() + path.extname(file.originalname));
+  }
+});
 
-module.exports = router;
+const upload = multer({ storage: storage });
