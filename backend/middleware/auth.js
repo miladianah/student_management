@@ -1,23 +1,32 @@
 const jwt = require('jsonwebtoken');
 
-const verifyToken = (req, res, next) => {
-  const token = req.headers.authorization?.split(' ')[1];
-  if (!token) return res.status(401).json({ message: 'Access denied. No token.' });
-
+const authenticate = (req, res, next) => {
   try {
+    const authHeader = req.headers.authorization;
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return res.status(401).json({ message: 'Authentication required.' });
+    }
+    const token = authHeader.split(' ')[1];
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     req.user = decoded;
     next();
-  } catch {
-    res.status(401).json({ message: 'Invalid or expired token.' });
+  } catch (err) {
+    return res.status(401).json({ message: 'Invalid or expired token.' });
   }
 };
 
-const requireRole = (...roles) => (req, res, next) => {
-  if (!roles.includes(req.user.role)) {
-    return res.status(403).json({ message: 'Access forbidden.' });
+const teacherOnly = (req, res, next) => {
+  if (req.user.role !== 'teacher') {
+    return res.status(403).json({ message: 'Access denied. Teachers only.' });
   }
   next();
 };
 
-module.exports = { verifyToken, requireRole };
+const studentOnly = (req, res, next) => {
+  if (req.user.role !== 'student') {
+    return res.status(403).json({ message: 'Access denied. Students only.' });
+  }
+  next();
+};
+
+module.exports = { authenticate, teacherOnly, studentOnly };

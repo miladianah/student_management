@@ -1,21 +1,44 @@
 const express = require('express');
 const router = express.Router();
-const { verifyToken, requireRole } = require('../middleware/auth');
-const upload = require('../middleware/upload');
-const { getMyClasses, createClass, getClassStudents, createAssignment, getMyAssignments, getSubmissions, gradeSubmission, getMyResults, createResult, createNote, getNotes, getDashboardStats } = require('../controllers/teacherController');
+const { authenticate, teacherOnly } = require('../middleware/auth');
+const {
+  getClasses,
+  createClass,
+  updateClass,
+  deleteClass,
+  getStudents,
+  getAssignments,
+  createAssignment,
+  getNotes,
+  createNote,
+  getResults,
+  createResult,
+  getDashboardStats,
+} = require('../controllers/teacherController');
 
-router.use(verifyToken, requireRole('teacher'));
-router.get('/stats', getDashboardStats);
-router.get('/classes', getMyClasses);
+// All routes require authentication + teacher role
+router.use(authenticate, teacherOnly);
+
+// Dashboard
+router.get('/dashboard', getDashboardStats);
+
+// Classes
+router.get('/classes', getClasses);
 router.post('/classes', createClass);
-router.get('/classes/:classId/students', getClassStudents);
-router.get('/assignments', getMyAssignments);
-router.post('/assignments', upload.single('file'), createAssignment);
-router.get('/assignments/:assignmentId/submissions', getSubmissions);
-router.put('/submissions/:submissionId/grade', gradeSubmission);
-router.get('/results', getMyResults);
-router.post('/results', createResult);
+router.put('/classes/:id', updateClass);
+router.delete('/classes/:id', deleteClass);
+router.get('/classes/:id/students', getStudents);
+
+// Assignments
+router.get('/assignments', getAssignments);
+router.post('/assignments', createAssignment);
+
+// Notes
 router.get('/notes', getNotes);
-router.post('/notes', upload.single('file'), createNote);
+router.post('/notes', createNote);
+
+// Results
+router.get('/results', getResults);
+router.post('/results', createResult);
 
 module.exports = router;

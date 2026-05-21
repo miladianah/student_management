@@ -1,26 +1,28 @@
 import axios from 'axios';
 
-// const api = axios.create({ baseURL: 'http://localhost:5000/api' });
-
-const api = axios.create({ 
-  baseURL: 'https://student-management-backend-cmz6.onrender.com/api' 
+const api = axios.create({
+  baseURL: 'http://localhost:5000/api',
+  withCredentials: true,
 });
 
+// Auto-attach token if stored in localStorage
 api.interceptors.request.use((config) => {
-  const token = localStorage.getItem('token');
-  if (token) config.headers.Authorization = `Bearer ${token}`;
+  const user = JSON.parse(localStorage.getItem('user') || 'null');
+  if (user?.token) {
+    config.headers.Authorization = `Bearer ${user.token}`;
+  }
   return config;
 });
 
+// Handle 401 globally
 api.interceptors.response.use(
-  (res) => res,
-  (err) => {
-    if (err.response?.status === 401) {
-      localStorage.removeItem('token');
+  (response) => response,
+  (error) => {
+    if (error.response?.status === 401) {
       localStorage.removeItem('user');
       window.location.href = '/login';
     }
-    return Promise.reject(err);
+    return Promise.reject(error);
   }
 );
 
