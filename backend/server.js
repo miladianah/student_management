@@ -1,46 +1,48 @@
 const express = require('express');
-const path = require('path');
-require('dotenv').config();
-const fs = require('fs');
+const cors = require('cors');
+const cookieParser = require('cookie-parser');
+
+const authRoutes = require('./routes/authRoutes');
+const studentRoutes = require('./routes/studentRoutes');
+const teacherRoutes = require('./routes/teacherRoutes');
+
 const app = express();
 
+// Middleware
+app.use(cors({
+  origin: 'http://localhost:5173',
+  credentials: true,
+}));
+app.use(express.json());
+app.use(cookieParser());
 
-// Emeza niba folder ya uploads iriho, niba itariho ihite uyihanza bwikora
-const uploadDir = path.join(__dirname, 'uploads');
-if (!fs.existsSync(uploadDir)) {
-    fs.mkdirSync(uploadDir, { recursive: true });
-    console.log('Uploads folder created successfully for Render!');
-}
+// Serve uploaded files
+app.use('/uploads', express.static('uploads'));
 
-// 1. HITAMO KUGIRIRA CORS ITURUTSE KURI EXPRESS DIRECTLY (Siba ya cors package)
-app.use((req, res, next) => {
-  res.setHeader('Access-Control-Allow-Origin', 'https://imaginative-naiad-f52119.netlify.app');
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-  res.setHeader('Access-Control-Allow-Credentials', 'true');
-  
-  // Niba ari OPTIONS request (Preflight), hita uyisubiza ako kanya ntirindire kujya mu ma routes
-  if (req.method === 'OPTIONS') {
-    return res.sendStatus(200);
-  }
-  next();
+// ===== MOUNT ROUTES HERE =====
+app.use('/api/auth', authRoutes);
+app.use('/api/student', studentRoutes);
+app.use('/api/teacher', teacherRoutes); // This connects /api/teacher to teacherRoutes.js
+// =============================
+
+// Health check route to test if server is alive
+app.get('/api/health', (req, res) => {
+  res.json({ status: 'ok', message: 'Server is running' });
 });
 
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+// 404 Catch-all handler (if a route doesn't match anything above)
+app.use((req, res) => {
+  console.log(`❌ 404 Not Found: ${req.method} ${req.originalUrl}`);
+  res.status(404).json({ message: `Route not found: ${req.method} ${req.originalUrl}` });
+});
 
-// Ama-routes yawe...
-app.use('/api/auth', require('./routes/auth'));
-app.use('/api/admin', require('./routes/admin'));
-app.use('/api/teacher', require('./routes/teacher'));
-app.use('/api/student', require('./routes/student'));
-app.use('/api/chat', require('./routes/chat'));
-app.use('/api/profile', require('./routes/profile'));
-
-app.get('/', (req, res) => res.json({ message: 'Tr Dave System API Running' }));
+// Global Error Handler
+app.use((err, req, res, next) => {
+  console.error('🔥 Server Error:', err);
+  res.status(500).json({ message: 'Internal server error' });
+});
 
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, '0.0.0.0', () => {
-  console.log(`Server running perfectly on port ${PORT}`);
+app.listen(PORT, () => {
+  console.log(`✅ Server running on port ${PORT}`);
 });
