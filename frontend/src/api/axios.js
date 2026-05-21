@@ -1,10 +1,11 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: 'http://localhost:5000/api', // MUST MATCH YOUR SERVER PORT
+  baseURL: 'http://localhost:5000/api',
   withCredentials: true,
 });
 
+// Auto-attach token if stored in localStorage
 api.interceptors.request.use((config) => {
   const user = JSON.parse(localStorage.getItem('user') || 'null');
   if (user?.token) {
@@ -13,6 +14,7 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
+// Handle 401 globally
 api.interceptors.response.use(
   (response) => response,
   (error) => {
